@@ -1,0 +1,48 @@
+{
+  "manifest_version": 3,
+  "name": "EPStudy Sync",
+  "description": "Syncs EPStudy V6 with Canvas, TeamSnap schedules, Membean, and the selected website mode.",
+  "version": "1.6.0",
+  "icons": {
+    "128": "icon128.png"
+  },
+  "permissions": ["alarms", "declarativeNetRequest", "notifications", "scripting", "storage", "tabs"],
+  "host_permissions": [
+    "https://eastsideprep.instructure.com/*",
+    "https://go.teamsnap.com/*",
+    "https://*.membean.com/*",
+    "https://membean.com/*",
+    "https://www.eastsideprep.org/*",
+    "https://sillywaffle-4.github.io/Epstudy/*",
+    "http://localhost/*",
+    "http://127.0.0.1/*",
+    "http://0.0.0.0/*",
+    "file:///*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://sillywaffle-4.github.io/Epstudy/*",
+        "http://localhost/*",
+        "http://127.0.0.1/*",
+        "http://0.0.0.0/*",
+        "file:///*"
+      ],
+      "js": ["website-bridge.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://eastsideprep.instructure.com/*",
+        "https://go.teamsnap.com/*",
+        "https://*.membean.com/*",
+        "https://membean.com/*"
+      ],
+      "js": ["source-scraper.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
