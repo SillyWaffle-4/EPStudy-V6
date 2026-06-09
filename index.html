@@ -46,7 +46,7 @@
 
   #fxCanvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; opacity: 0.4; transition: opacity 0.2s ease; }
 
-  .shell { position: relative; z-index: 10; max-width: 1400px; margin: 0 auto; padding: 1.5rem; }
+  .shell { position: relative; z-index: 10; max-width: none; margin: 0; padding: 1.25rem 1.25rem 1.5rem 260px; }
 
   /* Modern Header */
   .topbar { background: color-mix(in srgb, var(--panel) 94%, var(--bg-gray)); border: 1px solid var(--border); box-shadow: var(--shadow-sm); border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; transition: all 0.3s ease; backdrop-filter: blur(14px); }
@@ -63,8 +63,9 @@
   .section-title { font-size: 1.1rem; font-weight: 800; color: var(--text-dark); margin: 2rem 0 1rem; padding-bottom: 0.65rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-end; letter-spacing: 0; }
 
   /* NAVIGATION & PAGES */
-  .navbar { position: sticky; top: 0.75rem; z-index: 30; display: flex; gap: 4px; justify-content: flex-start; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; padding: 6px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: color-mix(in srgb, var(--panel) 78%, var(--bg-gray)); box-shadow: var(--shadow-md); backdrop-filter: blur(16px); }
-  .nav-btn { position: relative; display: inline-flex; align-items: center; gap: 8px; background: transparent; border: 1px solid transparent; color: var(--text-main); padding: 9px 12px; border-radius: var(--radius-md); cursor: pointer; font-weight: 700; transition: background 0.2s, color 0.2s, border-color 0.2s; font-size: 0.88rem; min-height: 40px; }
+  .navbar { position: fixed; left: 1rem; top: 1rem; bottom: 1rem; width: 224px; z-index: 35; display: flex; flex-direction: column; gap: 6px; justify-content: flex-start; align-items: stretch; margin-bottom: 0; padding: 10px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: color-mix(in srgb, var(--panel) 86%, var(--bg-gray)); box-shadow: var(--shadow-md); backdrop-filter: blur(16px); overflow-y: auto; }
+  .navbar::before { content: "EPStudy V6"; display: block; margin: 2px 4px 8px; color: var(--navy-primary); font-weight: 900; letter-spacing: -0.02em; }
+  .nav-btn { position: relative; width: 100%; display: inline-flex; align-items: center; justify-content: flex-start; gap: 8px; background: transparent; border: 1px solid transparent; color: var(--text-main); padding: 10px 12px; border-radius: var(--radius-md); cursor: pointer; font-weight: 700; transition: background 0.2s, color 0.2s, border-color 0.2s; font-size: 0.9rem; min-height: 42px; text-align: left; }
   .nav-btn.active { background: var(--panel); color: var(--navy-primary); border-color: var(--border); box-shadow: var(--shadow-sm); }
   .nav-btn:hover:not(.active) { background: var(--panel); color: var(--text-dark); }
   .nav-icon { width: 18px; height: 18px; border-radius: 5px; display: inline-grid; place-items: center; flex: 0 0 auto; background: var(--bg-gray); color: var(--navy-primary); font-size: 0.68rem; font-weight: 800; line-height: 1; border: 1px solid var(--border); }
@@ -124,6 +125,25 @@
   .contact-form input, .contact-form textarea { border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-family: inherit; font-size: 0.95rem; background: var(--panel); color: var(--text-dark); }
   .contact-form textarea { resize: vertical; min-height: 140px; }
   .contact-form button { margin-top: 12px; }
+
+  .help-layout { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 1rem; align-items: start; }
+  .help-hero { grid-column: 1 / -1; background: linear-gradient(135deg, var(--panel), color-mix(in srgb, var(--gold) 14%, var(--panel))); }
+  .help-hero h2 { margin: 0 0 0.5rem; color: var(--text-dark); font-size: clamp(1.8rem, 3vw, 2.6rem); letter-spacing: -0.03em; }
+  .help-card { grid-column: span 4; }
+  .help-card p { min-height: 4.8rem; color: var(--muted); }
+  .help-steps { grid-column: 1 / -1; }
+  .help-steps ol { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.7rem; margin: 0; padding: 0; list-style: none; counter-reset: help-step; }
+  .help-steps li { counter-increment: help-step; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.9rem; background: var(--panel); box-shadow: var(--shadow-sm); }
+  .help-steps li::before { content: counter(help-step); display: inline-grid; place-items: center; width: 30px; height: 30px; margin-bottom: 0.6rem; border-radius: 999px; background: var(--navy-primary); color: var(--primary-content); font-weight: 900; }
+  .help-steps strong, .help-steps span { display: block; }
+  .help-steps span { margin-top: 0.25rem; color: var(--muted); }
+
+  .walkthrough-highlight { position: relative; z-index: 80 !important; outline: 4px solid color-mix(in srgb, var(--gold) 82%, #fff); box-shadow: 0 0 0 8px color-mix(in srgb, var(--gold) 18%, transparent), 0 20px 52px rgba(15, 23, 42, 0.24) !important; }
+  .walkthrough-scrim { position: fixed; inset: 0; z-index: 90; pointer-events: none; background: transparent; }
+  .walkthrough-card { position: fixed; right: clamp(1rem, 3vw, 2.5rem); bottom: clamp(1rem, 3vw, 2.5rem); width: min(430px, calc(100vw - 2rem)); z-index: 91; pointer-events: auto; border: 1px solid var(--border); border-radius: var(--radius-lg); background: color-mix(in srgb, var(--panel) 96%, #fff); box-shadow: 0 24px 70px rgba(15, 23, 42, 0.28); padding: 1.15rem; }
+  .walkthrough-card h2 { margin: 0 0 0.45rem; color: var(--navy-primary); }
+  .walkthrough-card p { color: var(--text-main); }
+  .walkthrough-actions { display: flex; gap: 0.55rem; flex-wrap: wrap; margin-top: 1rem; }
 
   /* Grid & Panels */
   .grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;}
@@ -675,7 +695,8 @@
     .topbar { padding: 1rem; justify-content: center;}
     .actions { width: 100%; }
     .actions .button { flex: 1 1 140px; }
-    .navbar { top: 0.35rem; overflow-x: auto; flex-wrap: nowrap; justify-content: flex-start; }
+    .navbar { position: sticky; left: auto; top: 0.35rem; bottom: auto; width: auto; flex-direction: row; overflow-x: auto; flex-wrap: nowrap; justify-content: flex-start; margin-bottom: 1rem; }
+    .navbar::before { content: none; }
     .nav-btn { flex: 0 0 auto; }
     .task-form { grid-template-columns: 1fr; }
     .task-form .span-6, .task-form .span-4, .task-form .span-3 { grid-column: span 1; }
@@ -694,6 +715,8 @@
     .eps-day-section, .eps-schedule-grid { grid-template-columns: 1fr; }
     .eps-lunch-card { position: static; }
     .guide-hero, .guide-feature-grid, .guide-columns, .guide-setup-grid { grid-template-columns: 1fr; }
+    .help-layout { grid-template-columns: 1fr; }
+    .help-card, .help-hero, .help-steps { grid-column: 1 / -1; }
     .guide-hero { padding: 1.35rem; }
     .guide-body { padding: 1rem; }
     .welcome-hero { min-height: 520px; }
@@ -720,7 +743,7 @@
     <div class="actions">
       <button id="quickSyncBtn" class="button primary" type="button">Sync</button>
       <button id="clearDoneBtn" class="button" type="button">Clear Done</button>
-      <button id="tutorialBtn" class="button primary" type="button">Guide</button>
+      <button id="tutorialBtn" class="button primary" type="button">Tutorial</button>
       <button id="resetAllBtn" class="button danger" type="button" style="margin-left: auto;">Reset</button>
     </div>
   </header>
@@ -731,6 +754,7 @@
     <button class="nav-btn" data-page="timer" onclick="navigate('timer')"><span class="nav-icon">FT</span>Focus Timer</button>
     <button class="nav-btn" data-page="calendar" onclick="navigate('calendar')"><span class="nav-icon">CA</span>Full Calendar</button>
     <button class="nav-btn" data-page="cosmetics" onclick="navigate('cosmetics')"><span class="nav-icon">CS</span>Cosmetics</button>
+    <button class="nav-btn" data-page="help" onclick="navigate('help')"><span class="nav-icon">HP</span>Help</button>
     <button class="nav-btn" data-page="settings" onclick="navigate('settings')"><span class="nav-icon">ST</span>Settings</button>
     <button class="nav-btn" data-page="contact" onclick="navigate('contact')"><span class="nav-icon">CO</span>Contact</button>
   </div>
@@ -1264,6 +1288,64 @@
       </section>
     </div>
 
+    <!-- HELP PAGE -->
+    <div id="page-help" class="page">
+      <section class="help-layout">
+        <article class="panel help-hero">
+          <p class="eyebrow">Help Center</p>
+          <h2>Find the feature you need without digging.</h2>
+          <p class="helper-text">Short guides for setup, syncing, privacy, and the daily workflow. The visual walkthrough is intentionally short.</p>
+          <div class="row">
+            <button class="button primary" type="button" data-action="start-walkthrough" onclick="startVisualWalkthrough()">Start visual walkthrough</button>
+            <button class="button" type="button" data-action="open-full-guide" onclick="openGuide()">Open full guide</button>
+            <a class="button primary" href="https://chromewebstore.google.com/detail/epstudy-sync/glajcaifhmapabedfnjhclalmnmklldb?hl=en-US&utm_source=ext_sidebar" target="_blank" rel="noopener noreferrer">Download extension</a>
+          </div>
+        </article>
+        <article class="panel help-card">
+          <h2>Start Here</h2>
+          <p>Sync once, check Dashboard, then use Smart Suggestion or Today Plan to choose the first useful task.</p>
+          <button class="button" type="button" data-action="start-walkthrough" onclick="startVisualWalkthrough()">Open walkthrough</button>
+        </article>
+        <article class="panel help-card">
+          <h2>Sync Setup</h2>
+          <p>One extension install can feed the main EPStudy URL and the standalone V6 URL. Keep EPStudy open with signed-in Canvas, TeamSnap, and Membean tabs.</p>
+          <div class="row">
+            <button class="button primary" type="button" onclick="requestExtensionSync('Syncing from Help...')">Sync now</button>
+            <button class="button" type="button" onclick="navigate('settings')">Settings</button>
+          </div>
+        </article>
+        <article class="panel help-card">
+          <h2>Tasks</h2>
+          <p>Checking a task marks it complete locally and publishes that state to the shared extension cache so work does not bounce back right away.</p>
+          <button class="button" type="button" onclick="navigate('tasks')">Open Tasks</button>
+        </article>
+        <article class="panel help-card">
+          <h2>Calendar</h2>
+          <p>The calendar shows Canvas work and TeamSnap events. The weekly dashboard card is for quick scanning; Full Calendar is for planning.</p>
+          <button class="button" type="button" onclick="navigate('calendar')">Open Calendar</button>
+        </article>
+        <article class="panel help-card">
+          <h2>Dashboard Layout</h2>
+          <p>Use Settings to enter dashboard layout editing. You can move widgets, resize them, and hide sections you do not need.</p>
+          <button class="button" type="button" onclick="navigate('settings')">Edit Layout</button>
+        </article>
+        <article class="panel help-card">
+          <h2>Cosmetics</h2>
+          <p>Cosmetics are available outside active class periods, plus secret config codes can unlock special skins and modes.</p>
+          <button class="button" type="button" onclick="navigate('cosmetics')">Open Cosmetics</button>
+        </article>
+        <article class="panel help-steps">
+          <h2>Recommended Setup</h2>
+          <ol>
+            <li><strong>Open Settings.</strong><span>Enable Schedule, Membean, or TeamSnap only if you use them.</span></li>
+            <li><strong>Run Sync.</strong><span>Let the extension read Canvas first, then optional sources.</span></li>
+            <li><strong>Check Dashboard.</strong><span>Use Today Plan and Smart Suggestion before opening the full list.</span></li>
+            <li><strong>Start a timer.</strong><span>Pick one task, focus, then mark it done when the work is genuinely complete.</span></li>
+          </ol>
+        </article>
+      </section>
+    </div>
+
     <!-- CONTACT PAGE -->
     <div id="page-contact" class="page">
       <h2 class="section-title">Contact & Support</h2>
@@ -1589,9 +1671,49 @@
     timer: "Focus Timer",
     calendar: "Full Calendar",
     cosmetics: "Cosmetics",
+    help: "Help",
     settings: "Settings",
     contact: "Contact"
   };
+
+  const WALKTHROUGH_STEPS = [
+    {
+      page: "dashboard",
+      selector: '[data-page="dashboard"]',
+      title: "Start on Dashboard",
+      body: "Dashboard is the daily command center: Today Plan, Smart Suggestion, Focus Center, schedule awareness, and the calendar outline."
+    },
+    {
+      page: "dashboard",
+      selector: '[data-dashboard-widget="today"]',
+      title: "Check Today Plan",
+      body: "Start here when you want the shortest route to useful work. It keeps the next few tasks visible without opening every class."
+    },
+    {
+      page: "dashboard",
+      selector: '[data-dashboard-widget="smart"]',
+      title: "Use Smart Suggestion",
+      body: "Smart Suggestion looks at due dates and priority so you can pick one task instead of staring at the whole list."
+    },
+    {
+      page: "dashboard",
+      selector: '[data-dashboard-widget="timer"]',
+      title: "Start a Focus Session",
+      body: "Load a task into Focus Center or open the full Focus Timer tab when you need presets, shield mode, and session tracking."
+    },
+    {
+      page: "settings",
+      selector: "#extensionSyncBtn, #quickSyncBtn",
+      title: "Sync from Settings",
+      body: "Settings controls Canvas, TeamSnap, Membean, schedule, courses, dashboard layout, and config codes."
+    },
+    {
+      page: "help",
+      selector: "#page-help .help-hero",
+      title: "Come Back to Help",
+      body: "Help keeps the short walkthrough, full guide, extension download, and setup reminders in one place."
+    }
+  ];
 
   const DASHBOARD_WIDGETS = [
     { id: "today", label: "Today Plan", defaultSize: "wide" },
@@ -2687,6 +2809,72 @@
     logAnalyticsEvent("page_view", { to: page, updateHistory: Boolean(updateHistory) });
     renderAll();
   }
+
+  let visualWalkthroughIndex = null;
+
+  function clearWalkthroughHighlight() {
+    document.querySelectorAll(".walkthrough-highlight").forEach(el => el.classList.remove("walkthrough-highlight"));
+  }
+
+  function closeVisualWalkthrough() {
+    visualWalkthroughIndex = null;
+    clearWalkthroughHighlight();
+    document.getElementById("visualWalkthrough")?.remove();
+  }
+
+  function renderVisualWalkthrough() {
+    if (visualWalkthroughIndex === null) return;
+    const step = WALKTHROUGH_STEPS[visualWalkthroughIndex];
+    if (!step) return closeVisualWalkthrough();
+    clearWalkthroughHighlight();
+    const target = document.querySelector(step.selector);
+    target?.classList.add("walkthrough-highlight");
+    target?.scrollIntoView({ block: "center", inline: "nearest", behavior: "smooth" });
+
+    let shell = document.getElementById("visualWalkthrough");
+    if (!shell) {
+      shell = document.createElement("div");
+      shell.id = "visualWalkthrough";
+      shell.className = "walkthrough-scrim";
+      document.body.appendChild(shell);
+    }
+    shell.innerHTML = `
+      <article class="walkthrough-card" role="dialog" aria-modal="true" aria-label="EPStudy walkthrough">
+        <p class="eyebrow">Guide step ${visualWalkthroughIndex + 1} of ${WALKTHROUGH_STEPS.length}</p>
+        <h2>${escapeHtml(step.title)}</h2>
+        <p>${escapeHtml(step.body)}</p>
+        <div class="walkthrough-actions">
+          <button class="button" type="button" data-walkthrough-prev ${visualWalkthroughIndex === 0 ? "disabled" : ""}>Previous</button>
+          <button class="button primary" type="button" data-walkthrough-next>${visualWalkthroughIndex === WALKTHROUGH_STEPS.length - 1 ? "Done" : "Next"}</button>
+          <button class="button" type="button" data-walkthrough-close>Skip</button>
+        </div>
+      </article>
+    `;
+  }
+
+  function showVisualWalkthroughStep(index) {
+    const next = Math.max(0, Math.min(WALKTHROUGH_STEPS.length - 1, index));
+    visualWalkthroughIndex = next;
+    const step = WALKTHROUGH_STEPS[next];
+    navigate(step.page);
+    window.setTimeout(renderVisualWalkthrough, 80);
+  }
+
+  function startVisualWalkthrough() {
+    showVisualWalkthroughStep(0);
+  }
+
+  document.addEventListener("click", (event) => {
+    const prev = event.target.closest("[data-walkthrough-prev]");
+    const next = event.target.closest("[data-walkthrough-next]");
+    const close = event.target.closest("[data-walkthrough-close]");
+    if (!prev && !next && !close) return;
+    event.preventDefault();
+    if (close) return closeVisualWalkthrough();
+    if (prev) return showVisualWalkthroughStep((visualWalkthroughIndex || 0) - 1);
+    if (next && visualWalkthroughIndex === WALKTHROUGH_STEPS.length - 1) return closeVisualWalkthrough();
+    if (next) return showVisualWalkthroughStep((visualWalkthroughIndex || 0) + 1);
+  });
 
   window.addEventListener("popstate", (e) => {
     const page = e.state?.page || new URLSearchParams(window.location.search).get("page") || "dashboard";
@@ -4131,6 +4319,7 @@
       { id: "tasks", icon: "TS", title: "Open Tasks", detail: "Search, filter, and manage work", run: () => navigate("tasks") },
       { id: "timer", icon: "FT", title: "Open Focus Timer", detail: "Start or tune a focus session", run: () => navigate("timer") },
       { id: "calendar", icon: "CA", title: "Open Calendar", detail: "See assignments and events", run: () => navigate("calendar") },
+      { id: "help", icon: "HP", title: "Open Help", detail: "Guides, setup, and the short walkthrough", run: () => navigate("help") },
       { id: "settings", icon: "ST", title: "Open Settings", detail: "Integrations, data, dashboard", run: () => navigate("settings") },
       { id: "sync", icon: "SY", title: "Sync Extension", detail: "Ask the extension for fresh data", run: () => requestExtensionSync() },
       { id: "smart", icon: "AI", title: "Load Smart Task", detail: "Put the top recommendation in the timer", run: () => { const smart = pickSmartTask(); if (smart.task) loadTaskInTimer(smart.task.id); } },
@@ -6844,14 +7033,14 @@
         return;
       }
       if (!typing && e.altKey && /^[1-6]$/.test(e.key)) {
-        const pages = ["dashboard", "tasks", "timer", "calendar", "cosmetics", "settings", "contact"];
+        const pages = ["dashboard", "tasks", "timer", "calendar", "cosmetics", "help", "settings", "contact"];
         logAnalyticsEvent("shortcut_page_nav", { shortcut: `alt+${e.key}`, to: pages[Number(e.key) - 1] || "" });
         navigate(pages[Number(e.key) - 1]);
       }
     });
 
     // Modals
-    document.getElementById("tutorialBtn")?.addEventListener("click", () => openGuide());
+    document.getElementById("tutorialBtn")?.addEventListener("click", () => startVisualWalkthrough());
     document.getElementById("welcomeContinueBtn")?.addEventListener("click", () => {
       document.getElementById("welcomeModal")?.classList.remove("open");
       document.getElementById("tutorialModal")?.classList.add("open");

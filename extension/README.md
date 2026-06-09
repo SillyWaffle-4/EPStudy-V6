@@ -8,7 +8,7 @@ This Chrome/Edge extension syncs signed-in school tabs with EPStudy. It has no p
 2. Turn on Developer mode.
 3. Click Load unpacked.
 4. Select this `extension` folder.
-5. Open EPStudy at `https://sillywaffle-4.github.io/Epstudy/` for V7 or `https://sillywaffle-4.github.io/EPStudy-V6/` for standalone V6. The Web Store package does not request file or local-development page access.
+5. Open EPStudy at `https://sillywaffle-4.github.io/Epstudy/` or `https://sillywaffle-4.github.io/EPStudy-V6/`. The Web Store package does not request file or local-development page access.
 
 ## Use
 
