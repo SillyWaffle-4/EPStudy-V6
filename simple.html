@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EPStudy Simple</title>
+<script src="./shared/supabase-analytics.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --navy: #002b5c;
+    --gold: #ffc72c;
+    --bg: #f5f7fb;
+    --panel: #ffffff;
+    --line: #dbe3ef;
+    --text: #111827;
+    --muted: #64748b;
+    --good: #15803d;
+    --danger: #dc2626;
+    --shadow: 0 18px 38px -28px rgb(15 23 42 / 0.45);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--text); font-family: Inter, system-ui, sans-serif; line-height: 1.45; }
+  button, input, select { font: inherit; }
+  .shell { width: min(1180px, calc(100% - 28px)); margin: 0 auto; padding: 18px 0 30px; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); box-shadow: var(--shadow); }
+  .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .logo { width: 42px; height: 42px; border-radius: 8px; object-fit: contain; background: var(--navy); }
+  .eyebrow { margin: 0; color: var(--muted); font-size: 0.73rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; }
+  h1 { margin: 0; font-size: clamp(1.35rem, 2vw, 1.8rem); letter-spacing: 0; }
+  .actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  select, input { min-height: 38px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--text); padding: 8px 10px; }
+  .button, button { min-height: 38px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--text); font-weight: 800; padding: 8px 11px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+  .button:hover, button:hover { border-color: var(--navy); }
+  .primary { background: var(--navy); border-color: var(--navy); color: #fff; }
+  .danger { color: var(--danger); }
+  .tabs { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin: 14px 0; }
+  .tab { background: #eef3f9; border-color: transparent; }
+  .tab.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .tab[hidden] { display: none; }
+  .page { display: none; }
+  .page.active { display: block; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; box-shadow: var(--shadow); }
+  .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .muted { color: var(--muted); }
+  .grid { display: grid; gap: 12px; }
+  .task-form { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(130px, 0.5fr) minmax(130px, 0.4fr) minmax(100px, 0.3fr) auto; gap: 8px; align-items: end; }
+  .task-list { display: grid; gap: 8px; }
+  .task { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; border: 1px solid var(--line); border-radius: 8px; padding: 10px; background: #fff; }
+  .task.done { opacity: 0.62; }
+  .task-title { font-weight: 800; overflow-wrap: anywhere; }
+  .task-meta { color: var(--muted); font-size: 0.83rem; margin-top: 2px; }
+  .task-actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  .calendar-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+  .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+  .day-name { color: var(--muted); font-size: 0.74rem; font-weight: 800; text-align: center; padding: 4px; }
+  .day { min-height: 92px; border: 1px solid var(--line); border-radius: 8px; background: #fff; padding: 7px; text-align: left; align-content: start; display: grid; gap: 4px; }
+  .day.outside { opacity: 0.42; }
+  .day.today { border-color: var(--navy); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--navy) 72%, transparent); background: color-mix(in srgb, var(--gold) 16%, #fff); }
+  .day.selected { outline: 3px solid color-mix(in srgb, var(--gold) 55%, transparent); border-color: var(--gold); }
+  .day.today .date-num { background: var(--navy); color: #fff; border-radius: 999px; width: 28px; height: 28px; display: inline-grid; place-items: center; }
+  .date-num { font-weight: 800; }
+  .pill { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; border-radius: 5px; padding: 2px 5px; background: #e8f1ff; color: var(--navy); font-size: 0.72rem; font-weight: 700; }
+  .timer-layout { display: grid; grid-template-columns: minmax(260px, 0.9fr) minmax(280px, 1fr); gap: 14px; align-items: stretch; }
+  .timer-face { display: grid; place-items: center; min-height: 280px; border: 1px solid var(--line); border-radius: 8px; background: linear-gradient(180deg, #fff, #f8fafc); }
+  .timer-time { font-size: clamp(3.6rem, 9vw, 6.5rem); font-weight: 800; font-variant-numeric: tabular-nums; color: var(--navy); letter-spacing: 0; line-height: 1; }
+  .timer-controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .stat { border: 1px solid var(--line); border-radius: 8px; padding: 10px; background: #fff; }
+  .stat strong { display: block; font-size: 1.25rem; }
+  .status { margin-top: 10px; color: var(--muted); min-height: 1.4em; }
+  .skin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  .skin-card { min-height: 116px; display: grid; align-content: end; justify-items: start; border: 1px solid var(--line); border-radius: 8px; padding: 10px; color: #fff; text-align: left; box-shadow: var(--shadow); overflow: hidden; }
+  .skin-card.selected { outline: 3px solid color-mix(in srgb, var(--gold) 70%, transparent); border-color: var(--gold); }
+  .skin-card strong, .skin-card span { position: relative; z-index: 1; text-shadow: 0 1px 10px rgba(15, 23, 42, 0.28); }
+  .skin-default { background: linear-gradient(145deg, #f5f7fb, #ffffff 55%, #dbeafe); color: var(--text); }
+  .skin-sunset { background: linear-gradient(135deg, #fb7185 0%, #f97316 45%, #facc15 100%); }
+  .skin-lagoon { background: linear-gradient(135deg, #06b6d4 0%, #2563eb 45%, #7c3aed 100%); }
+  .skin-watermelon { background: linear-gradient(135deg, #22c55e 0%, #14b8a6 42%, #f43f5e 100%); }
+  .skin-candy { background: linear-gradient(135deg, #ec4899 0%, #a855f7 45%, #38bdf8 100%); }
+  .skin-garden { background: linear-gradient(135deg, #84cc16 0%, #22c55e 45%, #f59e0b 100%); }
+  body.simple-skin-sunset { --bg: #fff7ed; --panel: #fffaf2; --navy: #c2410c; --gold: #facc15; }
+  body.simple-skin-lagoon { --bg: #ecfeff; --panel: #f8feff; --navy: #155e75; --gold: #38bdf8; }
+  body.simple-skin-watermelon { --bg: #f0fdf4; --panel: #ffffff; --navy: #166534; --gold: #fb7185; }
+  body.simple-skin-candy { --bg: #fdf2f8; --panel: #fff7fe; --navy: #7e22ce; --gold: #38bdf8; }
+  body.simple-skin-garden { --bg: #f7fee7; --panel: #ffffff; --navy: #3f6212; --gold: #f59e0b; }
+  @media (max-width: 800px) {
+    .tabs, .timer-layout, .stats { grid-template-columns: 1fr; }
+    .task-form { grid-template-columns: 1fr; }
+    .task { grid-template-columns: auto 1fr; }
+    .task-actions { grid-column: 1 / -1; justify-content: flex-start; }
+    .calendar-grid { gap: 4px; }
+    .day { min-height: 74px; padding: 5px; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="brand">
+      <img class="logo" data-shared-logo="logo.png" src="./shared/logo.png" alt="EPStudy logo" />
+      <div>
+        <p class="eyebrow">EPStudy Simple</p>
+        <h1>Tasks, Calendar, Timer</h1>
+      </div>
+    </div>
+    <div class="actions">
+      <button id="syncBtn" class="primary" type="button">Sync</button>
+      <a class="button" href="../../index.html">Back to Normal</a>
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="Simple navigation">
+    <button class="tab active" type="button" data-page="tasks">Tasks</button>
+    <button class="tab" type="button" data-page="calendar">Calendar</button>
+    <button class="tab" type="button" data-page="timer">Timer</button>
+    <button id="cosmeticsTab" class="tab" type="button" data-page="cosmetics" hidden>Cosmetics</button>
+  </nav>
+
+  <main>
+    <section id="page-tasks" class="page active">
+      <div class="panel grid">
+        <div class="toolbar">
+          <div>
+            <strong>Tasks</strong>
+            <span id="taskCount" class="muted"></span>
+          </div>
+          <select id="taskFilter" aria-label="Task filter">
+            <option value="open">Open</option>
+            <option value="all">All</option>
+            <option value="done">Done</option>
+          </select>
+        </div>
+        <form id="taskForm" class="task-form">
+          <input id="taskTitle" type="text" placeholder="Task title" required />
+          <select id="taskCourse" aria-label="Course"></select>
+          <input id="taskDate" type="date" required />
+          <input id="taskMinutes" type="number" min="1" max="360" value="25" required />
+          <button class="primary" type="submit">Add</button>
+        </form>
+        <div id="taskList" class="task-list"></div>
+      </div>
+    </section>
+
+    <section id="page-calendar" class="page">
+      <div class="panel">
+        <div class="calendar-head">
+          <button id="prevMonth" type="button">Prev</button>
+          <strong id="calendarTitle"></strong>
+          <button id="nextMonth" type="button">Next</button>
+        </div>
+        <div id="calendarGrid" class="calendar-grid"></div>
+        <div style="margin-top: 14px;">
+          <strong id="selectedDayTitle">Selected day</strong>
+          <div id="selectedDayTasks" class="task-list" style="margin-top: 8px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="page-timer" class="page">
+      <div class="panel timer-layout">
+        <div>
+          <div class="timer-face">
+            <div>
+              <div id="timerDisplay" class="timer-time">25:00</div>
+              <div id="timerStatus" class="status">Ready.</div>
+            </div>
+          </div>
+          <div class="timer-controls">
+            <button id="timerStart" class="primary" type="button">Start</button>
+            <button id="timerReset" type="button">Reset</button>
+            <button id="timerDone" type="button">Done</button>
+          </div>
+        </div>
+        <div class="grid">
+          <div>
+            <label class="muted" for="timerMinutes">Minutes</label>
+            <input id="timerMinutes" type="number" min="1" max="180" value="25" style="width: 100%;" />
+          </div>
+          <div>
+            <label class="muted" for="timerTask">Focus task</label>
+            <select id="timerTask" style="width: 100%;"></select>
+          </div>
+          <div class="stats">
+            <div class="stat"><strong id="sessionCount">0</strong><span class="muted">sessions</span></div>
+            <div class="stat"><strong id="minuteCount">0</strong><span class="muted">minutes</span></div>
+            <div class="stat"><strong id="streakCount">0</strong><span class="muted">streak</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="page-cosmetics" class="page">
+      <div class="panel grid">
+        <div>
+          <strong>Cosmetics</strong>
+          <p class="muted" style="margin: 4px 0 0;">Simple keeps this quiet: vivid static colors only, no animated effects.</p>
+        </div>
+        <div id="cosmeticsGrid" class="skin-grid"></div>
+        <p id="cosmeticsWindowNote" class="muted"></p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  const STORAGE_KEY = "epstudy_secure_pro_v6";
+  const VERSION_STORAGE_KEY = "epstudy_v6_selected_version";
+  const EPSTUDY_APP_VERSION = "simple";
+  const VERSION_PATHS = { normal: "index.html", simple: "simple.html" };
+  const DEFAULT_COURSES = [
+    { id: "course-personal", name: "Personal", code: "PERS", color: "#8b5cf6" },
+    { id: "course-sports", name: "Team Event", code: "TEAM", color: "#10b981" }
+  ];
+  const SIMPLE_SKINS = [
+    { id: "default", name: "Clean Sky", note: "Bright and calm.", className: "skin-default" },
+    { id: "sunset", name: "Sunset", note: "Warm coral and gold.", className: "skin-sunset" },
+    { id: "lagoon", name: "Lagoon", note: "Blue, cyan, violet.", className: "skin-lagoon" },
+    { id: "watermelon", name: "Watermelon", note: "Green and pink.", className: "skin-watermelon" },
+    { id: "candy", name: "Candy", note: "Pink, purple, sky.", className: "skin-candy" },
+    { id: "garden", name: "Garden", note: "Leafy and vivid.", className: "skin-garden" }
+  ];
+  const UNFILTERED_COURSE_ID = "course-unfiltered";
+  const UNFILTERED_COURSE = { id: UNFILTERED_COURSE_ID, name: "Unfiltered", code: "", color: "#64748b", hidden: true };
+  const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const state = loadState();
+  let currentPage = new URLSearchParams(window.location.search).get("page") || "tasks";
+  let taskFilter = "open";
+  let selectedDate = new Date();
+  let timerTotal = Math.max(1, Number(state.timerMinutes || 25)) * 60;
+  let timerRemaining = timerTotal;
+  let timerId = null;
+
+  function bridgeTargetOrigin() {
+    return window.location.protocol === "file:" || window.location.origin === "null" ? "*" : window.location.origin;
+  }
+
+  function sharedAssetUrl(name) {
+    const marker = "/V6/";
+    const path = window.location.pathname;
+    if (window.location.origin !== "null" && path.includes(marker)) {
+      const root = path.slice(0, path.indexOf(marker) + marker.length);
+      return `${window.location.origin}${root}shared/${name}`;
+    }
+    return new URL(`./shared/${name}`, document.baseURI).href;
+  }
+
+  const extensionSyncButtonLabels = {};
+  let extensionSyncFallbackTimer = null;
+  let websiteTasksPublishTimer = null;
+  let handlingExtensionPayload = false;
+
+  function setExtensionSyncing(active) {
+    ["syncBtn", "extensionSyncBtn", "quickSyncBtn"].forEach(id => {
+      const btn = document.getElementById(id);
+      if (!btn) return;
+      if (!extensionSyncButtonLabels[id]) extensionSyncButtonLabels[id] = btn.textContent || "Sync";
+      btn.disabled = Boolean(active);
+      btn.textContent = active ? "..." : extensionSyncButtonLabels[id];
+      btn.style.opacity = active ? "0.55" : "";
+      btn.style.filter = active ? "grayscale(0.45)" : "";
+      btn.style.cursor = active ? "wait" : "";
+    });
+    if (extensionSyncFallbackTimer) window.clearTimeout(extensionSyncFallbackTimer);
+    extensionSyncFallbackTimer = active ? window.setTimeout(() => setExtensionSyncing(false), 15000) : null;
+  }
+
+  function publishVersion(source = "init") {
+    try { localStorage.setItem(VERSION_STORAGE_KEY, EPSTUDY_APP_VERSION); } catch {}
+    window.postMessage({ type: "EPSTUDY_VERSION_SELECTED", version: EPSTUDY_APP_VERSION, source }, bridgeTargetOrigin());
+  }
+
+  function normalizeVersion(version) {
+    const value = String(version || "").toLowerCase();
+    if (value === "simple") return "simple";
+    if (["normal", "v2", "v3", "v4"].includes(value)) return "normal";
+    return "simple";
+  }
+
+  function logSimpleModeChange(destination, source = "simple") {
+    const to = String(destination || "").trim().toLowerCase();
+    if (!to || to === "simple" || to === "aiden") return;
+    window.EPSTUDY_ANALYTICS?.log("mode_changed", {
+      app: "mode-switch",
+      page: currentPage || "tasks",
+      metadata: {
+        appVersion: EPSTUDY_APP_VERSION,
+        mode: "simple",
+        page: currentPage || "tasks",
+        path: window.location.pathname,
+        to,
+        source
+      }
+    });
+  }
+
+  function switchVersion(version) {
+    const next = normalizeVersion(version);
+    saveState();
+    try { localStorage.setItem(VERSION_STORAGE_KEY, next); } catch {}
+    window.postMessage({ type: "EPSTUDY_VERSION_SELECTED", version: next, source: "switch" }, bridgeTargetOrigin());
+    logSimpleModeChange(next, "version_switch");
+    if (next !== "simple") window.location.href = VERSION_PATHS[next];
+  }
+
+  function loadState() {
+    const fallback = {
+      tasks: [],
+      courses: DEFAULT_COURSES.map(course => ({ ...course })),
+      selectedTaskId: null,
+      sessionsCompleted: 0,
+      focusMinutes: 0,
+      streakDays: 0,
+      lastSessionDate: null,
+      timerMinutes: 25,
+      selectedSimpleSkin: "default",
+      membeanSessionsCompleted: 0,
+      membeanSessionsLastUpdated: null,
+      ignoredTaskKeys: [],
+      calendarYear: new Date().getFullYear(),
+      calendarMonth: new Date().getMonth(),
+      calendarDay: new Date().getDate(),
+      extensionSync: { status: {}, sources: {}, teamSnapLinks: [] }
+    };
+    try {
+      const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+      if (!parsed || typeof parsed !== "object") return fallback;
+      const merged = { ...fallback, ...parsed };
+      merged.selectedSimpleSkin = SIMPLE_SKINS.some(skin => skin.id === merged.selectedSimpleSkin) ? merged.selectedSimpleSkin : "default";
+      merged.membeanSessionsCompleted = Math.max(0, Math.min(3, Number(merged.membeanSessionsCompleted) || 0));
+      merged.membeanSessionsLastUpdated = typeof merged.membeanSessionsLastUpdated === "string" ? merged.membeanSessionsLastUpdated : null;
+      merged.ignoredTaskKeys = Array.isArray(merged.ignoredTaskKeys) ? Array.from(new Set(merged.ignoredTaskKeys.map(String).filter(Boolean))).slice(-1000) : [];
+      merged.courses = normalizeCourses(merged.courses);
+      merged.tasks = normalizeTasks(merged.tasks, merged.courses);
+      return merged;
+    } catch {
+      return fallback;
+    }
+  }
+
+  function saveState() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {}
+  }
+
+  function queueWebsiteTasksPublish() {
+    if (handlingExtensionPayload) return;
+    if (websiteTasksPublishTimer) window.clearTimeout(websiteTasksPublishTimer);
+    websiteTasksPublishTimer = window.setTimeout(() => {
+      websiteTasksPublishTimer = null;
+      publishWebsiteTasks();
+    }, 120);
+  }
+
+  function normalizeCourses(courses) {
+    const seen = new Set();
+    const rows = (Array.isArray(courses) ? courses : [])
+      .map((course, index) => {
+        const id = String(course?.id || `course-${index}`).trim();
+        const name = String(course?.name || course?.course_code || "").replace(/\s+/g, " ").trim();
+        const code = String(course?.code || course?.course_code || "").replace(/\s+/g, " ").trim();
+        const color = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(course?.color || "") ? course.color : colorFromString(name || id);
+        if (!id || !name || isBadCanvasCourse(id, name, code)) return null;
+        const key = id.toLowerCase();
+        if (seen.has(key)) return null;
+        seen.add(key);
+        return { id, name, code, color, source: course?.source || "", hidden: Boolean(course?.hidden) || id === UNFILTERED_COURSE_ID };
+      })
+      .filter(Boolean);
+    for (const course of DEFAULT_COURSES) {
+      if (!rows.some(row => row.id === course.id)) rows.push({ ...course });
+    }
+    if (!rows.some(row => row.id === UNFILTERED_COURSE_ID)) rows.push({ ...UNFILTERED_COURSE });
+    return rows;
+  }
+
+  function isBadCanvasCourse(id, name, code) {
+    if (!String(id).startsWith("canvas-course-")) return false;
+    if (/^Canvas\s+\d+$/i.test(name) && (!code || /^C\d+$/i.test(code))) return true;
+    const label = `${name} ${code}`.replace(/\s+/g, " ").trim();
+    return /\b(course analytics|view course stream)\b/i.test(label) || /^(assignments?|files?)$/i.test(label)
+      || /^(announcements?|assignments?|files?|course analytics|dashboard|courses?|recent feedback|show all|view course stream)$/i.test(name);
+  }
+
+  function normalizeTasks(tasks, courses) {
+    return (Array.isArray(tasks) ? tasks : [])
+      .map(task => {
+      const courseId = String(task?.courseId || "").trim();
+        if (String(task?.source || "").toLowerCase() === "membean") return null;
+        if (courseId !== UNFILTERED_COURSE_ID && !courses.some(course => course.id === courseId)) return null;
+        const dueDate = parseDate(task?.dueDate || task?.due_at || task?.start_at || task?.date);
+        if (!dueDate) return null;
+        return {
+          id: String(task?.id || task?.externalKey || `${Date.now()}-${Math.random().toString(16).slice(2)}`),
+          title: String(task?.title || task?.name || "Task").replace(/\s+/g, " ").trim(),
+          dueDate: dueDate.toISOString(),
+          estimatedMinutes: Math.max(1, Math.min(360, Number(task?.estimatedMinutes || task?.minutes || 25))),
+          source: String(task?.source || "manual").toLowerCase(),
+          courseId,
+          completed: Boolean(task?.completed),
+          externalKey: String(task?.externalKey || ""),
+          rawCanvasCourseId: task?.rawCanvasCourseId ? String(task.rawCanvasCourseId) : "",
+          courseName: task?.courseName ? String(task.courseName) : "",
+          canvasUrl: task?.canvasUrl || task?.html_url || task?.url || "",
+          eventUrl: task?.eventUrl || ""
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+  }
+
+  function parseDate(value) {
+    const date = new Date(value || "");
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  function colorFromString(value) {
+    let hash = 0;
+    for (const char of String(value || "EPStudy")) hash = (hash * 31 + char.charCodeAt(0)) | 0;
+    return `hsl(${Math.abs(hash) % 360} 62% 42%)`;
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char]));
+  }
+
+  function taskAttr(value) {
+    return encodeURIComponent(String(value || ""));
+  }
+
+  function readTaskAttr(value) {
+    try { return decodeURIComponent(String(value || "")); } catch { return String(value || ""); }
+  }
+
+  function taskIdFromNode(node) {
+    return readTaskAttr(node?.dataset?.id || node?.closest?.(".task")?.dataset?.taskId || "");
+  }
+
+  function eventElement(event) {
+    const target = event?.target;
+    return target instanceof Element ? target : target?.parentElement || null;
+  }
+
+  function courseById(id) {
+    return state.courses.find(course => course.id === id) || null;
+  }
+
+  function visibleCourses(courses = state.courses) {
+    return (courses || []).filter(course => !course.hidden && course.id !== UNFILTERED_COURSE_ID);
+  }
+
+  function openTasks() {
+    return state.tasks.filter(task => taskFilter === "all" || (taskFilter === "done" ? task.completed : !task.completed));
+  }
+
+  function sameDay(a, b) {
+    return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  }
+
+  function isCosmeticsWindowOpen(date = new Date()) {
+    const minutes = date.getHours() * 60 + date.getMinutes();
+    return minutes >= (15 * 60 + 5) && minutes < (20 * 60);
+  }
+
+  function allowedPages() {
+    return isCosmeticsWindowOpen() ? ["tasks", "calendar", "timer", "cosmetics"] : ["tasks", "calendar", "timer"];
+  }
+
+  function applySimpleSkin() {
+    const skinId = SIMPLE_SKINS.some(skin => skin.id === state.selectedSimpleSkin) ? state.selectedSimpleSkin : "default";
+    document.body.className = document.body.className
+      .split(/\s+/)
+      .filter(cls => cls && !cls.startsWith("simple-skin-"))
+      .join(" ");
+    if (skinId !== "default") document.body.classList.add(`simple-skin-${skinId}`);
+  }
+
+  function dueLabel(value) {
+    const date = new Date(value);
+    return date.toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  }
+
+  function isoDate(date) {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  }
+
+  function setPage(page) {
+    currentPage = allowedPages().includes(page) ? page : "tasks";
+    document.querySelectorAll(".tab").forEach(tab => tab.classList.toggle("active", tab.dataset.page === currentPage));
+    document.querySelectorAll(".page").forEach(panel => panel.classList.toggle("active", panel.id === `page-${currentPage}`));
+    const url = new URL(window.location);
+    url.searchParams.set("page", currentPage);
+    history.replaceState({}, "", url);
+    render();
+  }
+
+  function render() {
+    applySimpleSkin();
+    renderCosmeticsAccess();
+    renderCourses();
+    if (currentPage === "tasks") renderTasks();
+    if (currentPage === "calendar") renderCalendar();
+    if (currentPage === "timer") renderTimer();
+    if (currentPage === "cosmetics") renderCosmetics();
+  }
+
+  function renderCosmeticsAccess() {
+    const open = isCosmeticsWindowOpen();
+    const tab = document.getElementById("cosmeticsTab");
+    if (tab) tab.hidden = !open;
+    if (!open && currentPage === "cosmetics") setPage("tasks");
+  }
+
+  function renderCosmetics() {
+    const grid = document.getElementById("cosmeticsGrid");
+    const note = document.getElementById("cosmeticsWindowNote");
+    if (!grid || !note) return;
+    if (!isCosmeticsWindowOpen()) {
+      grid.innerHTML = "";
+      note.textContent = "Cosmetics are available from 3:05 PM to 8:00 PM.";
+      return;
+    }
+    note.textContent = "Available now. This page disappears at 8:00 PM.";
+    grid.innerHTML = SIMPLE_SKINS.map(skin => `
+      <button class="skin-card ${skin.className}${state.selectedSimpleSkin === skin.id ? " selected" : ""}" type="button" data-skin-id="${escapeHtml(skin.id)}">
+        <strong>${escapeHtml(skin.name)}</strong>
+        <span>${escapeHtml(skin.note)}</span>
+      </button>
+    `).join("");
+  }
+
+  function renderCourses() {
+    const courseSelect = document.getElementById("taskCourse");
+    const taskSelect = document.getElementById("timerTask");
+    if (courseSelect) {
+      courseSelect.innerHTML = visibleCourses().map(course => `<option value="${escapeHtml(course.id)}">${escapeHtml(course.name)}${course.code ? ` (${escapeHtml(course.code)})` : ""}</option>`).join("");
+    }
+    if (taskSelect) {
+      const options = state.tasks.filter(task => !task.completed).map(task => `<option value="${escapeHtml(task.id)}">${escapeHtml(task.title)}</option>`).join("");
+      taskSelect.innerHTML = `<option value="">No task selected</option>${options}`;
+      taskSelect.value = state.selectedTaskId || "";
+    }
+  }
+
+  function renderTasks() {
+    const rows = openTasks();
+    const count = document.getElementById("taskCount");
+    if (count) count.textContent = ` ${rows.length} shown`;
+    const list = document.getElementById("taskList");
+    if (!list) return;
+    if (!rows.length) {
+      list.innerHTML = `<div class="muted">No tasks here.</div>`;
+      return;
+    }
+    list.innerHTML = rows.map(task => {
+      const course = courseById(task.courseId);
+      return `<article class="task${task.completed ? " done" : ""}" data-task-id="${taskAttr(task.id)}">
+        <input type="checkbox" data-action="toggle" data-id="${taskAttr(task.id)}" ${task.completed ? "checked" : ""} aria-label="Toggle task" />
+        <div>
+          <div class="task-title">${escapeHtml(task.title)}</div>
+          <div class="task-meta">${escapeHtml(course?.name || "Course")} · ${task.estimatedMinutes}m · ${dueLabel(task.dueDate)}</div>
+        </div>
+        <div class="task-actions">
+          <button type="button" data-action="timer" data-id="${taskAttr(task.id)}">Timer</button>
+          ${task.canvasUrl || task.eventUrl ? `<button type="button" data-action="open" data-id="${taskAttr(task.id)}">Open</button>` : ""}
+          <button class="danger" type="button" data-action="delete" data-id="${taskAttr(task.id)}">Dismiss</button>
+        </div>
+      </article>`;
+    }).join("");
+  }
+
+  function renderCalendar() {
+    const title = document.getElementById("calendarTitle");
+    const grid = document.getElementById("calendarGrid");
+    if (!title || !grid) return;
+    const year = selectedDate.getFullYear();
+    const month = selectedDate.getMonth();
+    title.textContent = selectedDate.toLocaleString([], { month: "long", year: "numeric" });
+    const first = new Date(year, month, 1);
+    const start = new Date(year, month, 1 - first.getDay());
+    const cells = [];
+    for (const label of DAY_NAMES) cells.push(`<div class="day-name">${label}</div>`);
+    for (let i = 0; i < 42; i++) {
+      const day = new Date(start);
+      day.setDate(start.getDate() + i);
+      const tasks = state.tasks.filter(task => sameDay(new Date(task.dueDate), day));
+      const isToday = sameDay(day, new Date());
+      cells.push(`<button class="day${day.getMonth() !== month ? " outside" : ""}${isToday ? " today" : ""}${sameDay(day, selectedDate) ? " selected" : ""}" type="button" data-date="${isoDate(day)}">
+        <span class="date-num">${day.getDate()}</span>
+        ${tasks.slice(0, 3).map(task => `<span class="pill">${escapeHtml(task.title)}</span>`).join("")}
+      </button>`);
+    }
+    grid.innerHTML = cells.join("");
+    renderSelectedDay();
+  }
+
+  function renderSelectedDay() {
+    const title = document.getElementById("selectedDayTitle");
+    const list = document.getElementById("selectedDayTasks");
+    if (!title || !list) return;
+    title.textContent = selectedDate.toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" });
+    const rows = state.tasks.filter(task => sameDay(new Date(task.dueDate), selectedDate));
+    list.innerHTML = rows.length ? rows.map(task => {
+      const course = courseById(task.courseId);
+      return `<article class="task${task.completed ? " done" : ""}" data-task-id="${taskAttr(task.id)}">
+        <input type="checkbox" data-action="toggle" data-id="${taskAttr(task.id)}" ${task.completed ? "checked" : ""} />
+        <div><div class="task-title">${escapeHtml(task.title)}</div><div class="task-meta">${escapeHtml(course?.name || "Course")} · ${dueLabel(task.dueDate)}</div></div>
+        <div class="task-actions"><button type="button" data-action="timer" data-id="${taskAttr(task.id)}">Timer</button></div>
+      </article>`;
+    }).join("") : `<div class="muted">No tasks due on this day.</div>`;
+  }
+
+  function renderTimer() {
+    const display = document.getElementById("timerDisplay");
+    const minutes = Math.floor(timerRemaining / 60);
+    const seconds = timerRemaining % 60;
+    if (display) display.textContent = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    const input = document.getElementById("timerMinutes");
+    if (input && document.activeElement !== input) input.value = String(state.timerMinutes || 25);
+    const start = document.getElementById("timerStart");
+    if (start) start.textContent = timerId ? "Pause" : "Start";
+    document.getElementById("sessionCount").textContent = String(state.sessionsCompleted || 0);
+    document.getElementById("minuteCount").textContent = String(state.focusMinutes || 0);
+    document.getElementById("streakCount").textContent = String(state.streakDays || 0);
+  }
+
+  function setTimerMinutes(minutes) {
+    state.timerMinutes = Math.max(1, Math.min(180, Number(minutes) || 25));
+    timerTotal = state.timerMinutes * 60;
+    timerRemaining = timerTotal;
+    saveState();
+    renderTimer();
+  }
+
+  function toggleTimer() {
+    if (timerId) {
+      clearInterval(timerId);
+      timerId = null;
+      document.getElementById("timerStatus").textContent = "Paused.";
+      renderTimer();
+      return;
+    }
+    if (timerRemaining <= 0) timerRemaining = timerTotal;
+    document.getElementById("timerStatus").textContent = "Focusing.";
+    timerId = window.setInterval(() => {
+      timerRemaining -= 1;
+      if (timerRemaining <= 0) completeTimer();
+      renderTimer();
+    }, 1000);
+    renderTimer();
+  }
+
+  function resetTimer() {
+    clearInterval(timerId);
+    timerId = null;
+    timerRemaining = timerTotal;
+    document.getElementById("timerStatus").textContent = "Ready.";
+    renderTimer();
+  }
+
+  function completeTimer() {
+    clearInterval(timerId);
+    timerId = null;
+    const minutes = Math.max(1, Math.round(timerTotal / 60));
+    state.sessionsCompleted = Number(state.sessionsCompleted || 0) + 1;
+    state.focusMinutes = Number(state.focusMinutes || 0) + minutes;
+    const today = isoDate(new Date());
+    if (state.lastSessionDate !== today) {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      state.streakDays = state.lastSessionDate === isoDate(yesterday) ? Number(state.streakDays || 0) + 1 : 1;
+      state.lastSessionDate = today;
+    }
+    if (state.selectedTaskId) {
+      const task = state.tasks.find(row => row.id === state.selectedTaskId);
+      if (task && !isCanvasForceIncompleteTask(task)) {
+        task.completed = true;
+        task.completedAt = new Date().toISOString();
+      }
+    }
+    timerRemaining = timerTotal;
+    document.getElementById("timerStatus").textContent = "Session complete.";
+    saveState();
+    queueWebsiteTasksPublish();
+    render();
+  }
+
+  function publishWebsiteTasks() {
+    window.postMessage({
+      type: "EPSTUDY_WEBSITE_TASKS",
+      tasks: state.tasks,
+      ignoredTaskKeys: state.ignoredTaskKeys || [],
+      updatedAt: new Date().toISOString(),
+      websiteVersion: EPSTUDY_APP_VERSION
+    }, bridgeTargetOrigin());
+  }
+
+  function isCanvasForceIncompleteTask(task) {
+    return Boolean(task?.canvasForceIncomplete || task?.forceIncomplete || task?.completionLockedIncomplete);
+  }
+
+  function canvasAssignmentId(task) {
+    const values = [task?.externalKey, task?.canvasUrl, task?.url, task?.eventUrl, task?.id].map(value => String(value || ""));
+    for (const value of values) {
+      const match = value.match(/assignments[/:_-]+(\d+)/i) || value.match(/canvas(?:-assignment)?[:_-]+(?:\d+[:_-]+)?(\d+)/i);
+      if (match) return match[1];
+    }
+    return "";
+  }
+
+  function taskIgnoreKeys(task) {
+    const keys = new Set();
+    if (!task) return [];
+    if (task.externalKey) keys.add(`external:${task.externalKey}`);
+    if (task.id) keys.add(`id:${task.id}`);
+    const assignmentId = canvasAssignmentId(task);
+    if (assignmentId) keys.add(`canvas-assignment:${assignmentId}`);
+    if (task.title && task.dueDate && task.courseId) keys.add(`fallback:${task.courseId}:${task.title}:${task.dueDate}`);
+    return Array.from(keys).filter(Boolean);
+  }
+
+  function isIgnoredTask(task) {
+    const stored = new Set(Array.isArray(state.ignoredTaskKeys) ? state.ignoredTaskKeys : []);
+    return taskIgnoreKeys(task).some(key => stored.has(key));
+  }
+
+  function rememberIgnoredTask(task) {
+    const keys = taskIgnoreKeys(task);
+    if (!keys.length) return;
+    state.ignoredTaskKeys = Array.from(new Set([...(state.ignoredTaskKeys || []), ...keys])).slice(-1000);
+  }
+
+  function mergedTaskCompleted(existingTask, incomingTask) {
+    if (isCanvasForceIncompleteTask(incomingTask)) return false;
+    return Boolean(existingTask?.completed || incomingTask?.completed);
+  }
+
+  function requestExtensionSync() {
+    setExtensionSyncing(true);
+    window.postMessage({ type: "EPSTUDY_EXTENSION_REQUEST_SYNC", config: { membeanEnabled: true } }, bridgeTargetOrigin());
+  }
+
+  function upsertCanvasCourses(courses) {
+    let changed = false;
+    for (const course of Array.isArray(courses) ? courses : []) {
+      const rawId = String(course?.id || course?.course_id || "").trim();
+      const name = String(course?.name || course?.course_code || "").replace(/\s+/g, " ").trim();
+      const code = String(course?.course_code || course?.code || "").replace(/\s+/g, " ").trim();
+      const id = `canvas-course-${rawId}`;
+      if (!rawId || !name || isBadCanvasCourse(id, name, code)) continue;
+      const existing = state.courses.find(row => row.id === id);
+      if (existing) {
+        existing.name = name;
+        existing.code = code;
+        changed = true;
+      } else {
+        state.courses.push({ id, name, code, color: colorFromString(`${name}-${rawId}`), source: "canvas" });
+        changed = true;
+      }
+    }
+    if (changed) state.courses = normalizeCourses(state.courses);
+  }
+
+  function resolveUnfilteredCanvasTasks() {
+    let changed = false;
+    for (const task of state.tasks) {
+      if (task.courseId !== UNFILTERED_COURSE_ID || String(task.source || "").toLowerCase() !== "canvas") continue;
+      const rawId = String(task.rawCanvasCourseId || task.courseIdRaw || task.course_id || "").replace(/^canvas-course-/, "").trim();
+      const directId = rawId ? `canvas-course-${rawId}` : "";
+      const matched = state.courses.find(course => (
+        !course.hidden &&
+        ((directId && course.id === directId) ||
+          (task.courseName && String(course.name || "").toLowerCase() === String(task.courseName).toLowerCase()) ||
+          (task.courseCode && String(course.code || "").toLowerCase() === String(task.courseCode).toLowerCase()))
+      ));
+      if (matched) {
+        task.courseId = matched.id;
+        changed = true;
+      }
+    }
+    return changed;
+  }
+
+  function normalizeIncomingTask(raw, source) {
+    const taskSource = String(raw?.source || source || "extension").toLowerCase();
+    if (taskSource === "membean") return null;
+    const rawCourse = String(raw?.courseId || raw?.course_id || raw?.context_code?.replace?.(/^course_/, "") || "").trim();
+    let courseId = rawCourse;
+    if (taskSource === "canvas" && /^\d+$/.test(rawCourse)) courseId = `canvas-course-${rawCourse}`;
+    if (taskSource === "canvas" && !state.courses.some(course => course.id === courseId)) {
+      const rawId = rawCourse.replace(/^canvas-course-/, "");
+      const courseName = String(raw?.courseName || raw?.context_name || raw?.course_name || "").trim();
+      if (/^\d+$/.test(rawId) && courseName && !isBadCanvasCourse(`canvas-course-${rawId}`, courseName, raw?.courseCode || raw?.course_code || "")) {
+        courseId = `canvas-course-${rawId}`;
+        state.courses.push({ id: courseId, name: courseName, code: raw?.courseCode || raw?.course_code || "", color: colorFromString(`${courseName}-${rawId}`), source: "canvas" });
+      }
+    }
+    if (taskSource === "canvas" && !state.courses.some(course => course.id === courseId)) courseId = UNFILTERED_COURSE_ID;
+    if (!state.courses.some(course => course.id === courseId)) return null;
+    const dueDate = parseDate(raw?.dueDate || raw?.due_at || raw?.start_at || raw?.startDate || raw?.date);
+    if (!dueDate) return null;
+    const title = String(raw?.title || raw?.name || "Task").replace(/^Assignment\b:?\s*/i, "").replace(/\s+/g, " ").trim();
+    if (!title) return null;
+    const externalKey = String(raw?.externalKey || `${taskSource}:${raw?.id || title}:${dueDate.toISOString()}`);
+    const incomingTask = {
+      id: String(raw?.id || externalKey).replace(/[^a-z0-9:_-]/gi, "-"),
+      title,
+      dueDate: dueDate.toISOString(),
+      estimatedMinutes: Math.max(1, Math.min(360, Number(raw?.estimatedMinutes || raw?.minutes || 30))),
+      source: taskSource,
+      courseId,
+      rawCanvasCourseId: taskSource === "canvas" ? rawCourse.replace(/^canvas-course-/, "") : "",
+      courseName: taskSource === "canvas" ? String(raw?.courseName || raw?.context_name || raw?.course_name || "").trim() : "",
+      courseCode: taskSource === "canvas" ? String(raw?.courseCode || raw?.course_code || "").trim() : "",
+      completed: Boolean(raw?.completed) && !isCanvasForceIncompleteTask(raw),
+      canvasForceIncomplete: Boolean(raw?.canvasForceIncomplete || raw?.forceIncomplete || raw?.completionLockedIncomplete),
+      forceIncompleteReason: raw?.forceIncompleteReason || raw?.incompleteReason || "",
+      canvasGrade: raw?.canvasGrade || raw?.grade || "",
+      canvasScore: raw?.canvasScore ?? raw?.score ?? null,
+      canvasPointsPossible: raw?.canvasPointsPossible ?? raw?.pointsPossible ?? null,
+      externalKey,
+      canvasUrl: raw?.canvasUrl || raw?.html_url || raw?.url || "",
+      eventUrl: raw?.eventUrl || ""
+    };
+    return isIgnoredTask(incomingTask) && !isCanvasForceIncompleteTask(incomingTask) ? null : incomingTask;
+  }
+
+  function upsertTasks(tasks, source) {
+    const incoming = (Array.isArray(tasks) ? tasks : []).map(task => normalizeIncomingTask(task, source)).filter(Boolean);
+    const byKey = new Map(state.tasks.map((task, index) => [task.externalKey || `${task.source}:${task.id}`, index]));
+    for (const task of incoming) {
+      const key = task.externalKey || `${task.source}:${task.id}`;
+      const index = byKey.get(key);
+      if (Number.isInteger(index)) state.tasks[index] = { ...state.tasks[index], ...task, completed: mergedTaskCompleted(state.tasks[index], task) };
+      else state.tasks.push(task);
+    }
+    state.tasks = normalizeTasks(state.tasks, state.courses);
+  }
+
+  function recordMembeanProgress(rows) {
+    if (!Array.isArray(rows)) return false;
+    for (const row of rows) {
+      const completed = Number(row?.progress?.completedSessions);
+      const required = Number(row?.progress?.requiredSessions);
+      if (!Number.isFinite(completed)) continue;
+      state.membeanSessionsCompleted = Math.max(0, Math.min(Number.isFinite(required) ? required : 3, completed));
+      state.membeanSessionsLastUpdated = new Date().toISOString();
+      return true;
+    }
+    return false;
+  }
+
+  function handleExtensionPayload(payload) {
+    if (!payload || typeof payload !== "object") return;
+    handlingExtensionPayload = true;
+    try {
+      upsertCanvasCourses(payload.courses || payload.canvasCourses || []);
+      resolveUnfilteredCanvasTasks();
+      upsertTasks(payload.canvas || [], "canvas");
+      resolveUnfilteredCanvasTasks();
+      upsertTasks(payload.teamsnap || [], "teamsnap");
+      recordMembeanProgress(payload.membean);
+      state.tasks = state.tasks.filter(task => String(task?.source || "").toLowerCase() !== "membean");
+      saveState();
+      render();
+    } finally {
+      handlingExtensionPayload = false;
+    }
+  }
+
+  function handleTaskActionClick(event) {
+    const target = eventElement(event);
+    if (!target) return;
+    const taskScope = target.closest("#taskList, #selectedDayTasks");
+    if (!taskScope) return;
+    const actionNode = target.closest("[data-action]");
+    if (!actionNode || !taskScope.contains(actionNode) || actionNode.dataset.action === "toggle") return;
+    const task = state.tasks.find(row => row.id === taskIdFromNode(actionNode));
+    if (!task) return;
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation?.();
+    const action = actionNode.dataset.action;
+    if (action === "delete") {
+      rememberIgnoredTask(task);
+      state.tasks = state.tasks.filter(row => row.id !== task.id);
+      queueWebsiteTasksPublish();
+    }
+    if (action === "timer") {
+      state.selectedTaskId = task.id;
+      setTimerMinutes(task.estimatedMinutes || state.timerMinutes || 25);
+      setPage("timer");
+    }
+    if (action === "open") {
+      const url = task.canvasUrl || task.eventUrl;
+      if (url) window.open(url, "_blank", "noopener,noreferrer");
+    }
+    saveState();
+    render();
+  }
+
+  function handleTaskToggleChange(event) {
+    const target = eventElement(event);
+    const taskScope = target?.closest("#taskList, #selectedDayTasks");
+    if (!taskScope) return;
+    const checkbox = target?.closest("[data-action='toggle']");
+    if (!checkbox || !taskScope.contains(checkbox)) return;
+    const task = state.tasks.find(row => row.id === taskIdFromNode(checkbox));
+    if (!task) return;
+    event.stopPropagation();
+    event.stopImmediatePropagation?.();
+    if (checkbox.checked && isCanvasForceIncompleteTask(task)) {
+      checkbox.checked = false;
+      task.completed = false;
+      document.getElementById("timerStatus").textContent = task.forceIncompleteReason || "Canvas says this assignment is not complete yet.";
+    } else {
+      task.completed = checkbox.checked;
+      task.completedAt = task.completed ? new Date().toISOString() : "";
+    }
+    saveState();
+    queueWebsiteTasksPublish();
+    render();
+  }
+
+  function registerEvents() {
+    document.querySelectorAll("[data-shared-logo]").forEach(img => {
+      img.src = sharedAssetUrl(img.dataset.sharedLogo || "logo.png");
+      img.onerror = () => {
+        img.removeAttribute("src");
+        img.alt = "EPStudy";
+      };
+    });
+    document.querySelectorAll(".tab").forEach(tab => tab.addEventListener("click", () => setPage(tab.dataset.page)));
+    document.getElementById("syncBtn").addEventListener("click", requestExtensionSync);
+    document.getElementById("taskFilter").addEventListener("change", event => { taskFilter = event.target.value; renderTasks(); });
+    document.getElementById("taskDate").value = isoDate(new Date());
+    document.getElementById("taskForm").addEventListener("submit", event => {
+      event.preventDefault();
+      const title = document.getElementById("taskTitle").value.trim();
+      const courseId = document.getElementById("taskCourse").value;
+      const date = document.getElementById("taskDate").value;
+      const minutes = Number(document.getElementById("taskMinutes").value || 25);
+      if (!title || !courseId || !date) return;
+      state.tasks.push({
+        id: `manual-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        title,
+        courseId,
+        dueDate: new Date(`${date}T23:59:00`).toISOString(),
+        estimatedMinutes: Math.max(1, Math.min(360, minutes)),
+        source: "manual",
+        completed: false,
+        externalKey: ""
+      });
+      event.target.reset();
+      document.getElementById("taskDate").value = isoDate(new Date());
+      document.getElementById("taskMinutes").value = "25";
+      saveState();
+      queueWebsiteTasksPublish();
+      render();
+    });
+    document.body.addEventListener("click", event => {
+      const target = eventElement(event);
+      if (!target) return;
+      const skinNode = target.closest("[data-skin-id]");
+      if (skinNode) {
+        if (!isCosmeticsWindowOpen()) return;
+        state.selectedSimpleSkin = skinNode.dataset.skinId;
+        saveState();
+        render();
+        return;
+      }
+      const dayNode = target.closest("[data-date]");
+      if (dayNode) {
+        selectedDate = new Date(`${dayNode.dataset.date}T12:00:00`);
+        renderCalendar();
+        return;
+      }
+    });
+    ["taskList", "selectedDayTasks"].forEach(id => {
+      const container = document.getElementById(id);
+      container?.addEventListener("click", handleTaskActionClick);
+      container?.addEventListener("change", handleTaskToggleChange);
+    });
+    document.getElementById("prevMonth").addEventListener("click", () => { selectedDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth() - 1, 1); renderCalendar(); });
+    document.getElementById("nextMonth").addEventListener("click", () => { selectedDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 1); renderCalendar(); });
+    document.getElementById("timerMinutes").addEventListener("change", event => setTimerMinutes(event.target.value));
+    document.getElementById("timerTask").addEventListener("change", event => { state.selectedTaskId = event.target.value; saveState(); });
+    document.getElementById("timerStart").addEventListener("click", toggleTimer);
+    document.getElementById("timerReset").addEventListener("click", resetTimer);
+    document.getElementById("timerDone").addEventListener("click", completeTimer);
+    window.addEventListener("message", event => {
+      if (event.source !== window || !event.data) return;
+      if (event.data.type === "EPSTUDY_EXTENSION_SYNC") {
+        setExtensionSyncing(false);
+        handleExtensionPayload(event.data.payload || {});
+      }
+      if (event.data.type === "EPSTUDY_EXTENSION_STATUS") {
+        setExtensionSyncing(false);
+        document.getElementById("timerStatus").textContent = event.data.message || "";
+      }
+    });
+  }
+
+  publishVersion("init");
+  registerEvents();
+  setPage(currentPage);
+  render();
+  window.setInterval(() => {
+    renderCosmeticsAccess();
+    renderCosmetics();
+  }, 60000);
+  publishWebsiteTasks();
+</script>
+</body>
+</html>
